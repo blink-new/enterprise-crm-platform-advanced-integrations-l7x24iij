@@ -1,9 +1,12 @@
-import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { useState, ReactNode } from 'react'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 
-export function Layout() {
+interface LayoutProps {
+  children: ReactNode
+}
+
+export function Layout({ children }: LayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   return (
@@ -15,7 +18,7 @@ export function Layout() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         <main className="flex-1 overflow-auto">
-          <Outlet />
+          {children}
         </main>
       </div>
     </div>

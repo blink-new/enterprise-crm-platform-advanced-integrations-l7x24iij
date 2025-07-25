@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { cn } from '@/lib/utils'
+import { cn } from '../../lib/utils'
 import {
   LayoutDashboard,
   Users,
@@ -16,23 +16,28 @@ import {
   Mail,
   FileText,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '../ui/button'
+import { Badge } from '../ui/badge'
+import { useAuth } from '../../hooks/useAuth'
+import { ROLE_LABELS } from '../../types/auth'
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Contacts', href: '/contacts', icon: Users },
-  { name: 'Leads', href: '/leads', icon: UserPlus },
-  { name: 'Opportunities', href: '/opportunities', icon: Target },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Contacts', href: '/contacts', icon: Users, requiredModule: 'contacts' },
+  { name: 'Leads', href: '/leads', icon: UserPlus, requiredModule: 'leads' },
+  { name: 'Opportunities', href: '/opportunities', icon: Target, requiredModule: 'opportunities' },
   { name: 'Companies', href: '/companies', icon: Building2 },
   { name: 'Tasks', href: '/tasks', icon: CheckSquare },
   { name: 'Calendar', href: '/calendar', icon: Calendar },
-  { name: 'Contracts', href: '/contracts', icon: FileText },
-  { name: 'Reports', href: '/reports', icon: BarChart3 },
+  { name: 'Contracts', href: '/contracts', icon: FileText, requiredModule: 'contracts' },
+  { name: 'Reports', href: '/reports', icon: BarChart3, requiredModule: 'reports' },
   { name: 'Marketing', href: '/marketing', icon: Mail },
-  { name: 'Billing', href: '/billing', icon: CreditCard },
-  { name: 'Integrations', href: '/integrations', icon: Plug },
+  { name: 'Billing', href: '/billing', icon: CreditCard, requiredModule: 'billing' },
+  { name: 'Integrations', href: '/integrations', icon: Plug, requiredModule: 'integrations' },
+  { name: 'Users', href: '/users', icon: Shield, requiredModule: 'users', adminOnly: true },
   { name: 'Settings', href: '/settings', icon: Settings },
 ]
 
@@ -43,6 +48,37 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation()
+  const { user, canAccess } = useAuth()
+
+  const getRoleBadgeColor = (role: string) => {
+    const colors = {
+      admin: 'bg-red-100 text-red-800',
+      lead_generation: 'bg-green-100 text-green-800',
+      pre_sales: 'bg-blue-100 text-blue-800',
+      sales: 'bg-purple-100 text-purple-800',
+      implementation: 'bg-orange-100 text-orange-800',
+      finance: 'bg-yellow-100 text-yellow-800'
+    }
+    return colors[role as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+  }
+
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+  }
+
+  // Filter navigation items based on user permissions
+  const filteredNavigation = navigation.filter(item => {
+    // Always show items without module requirements
+    if (!item.requiredModule) return true
+    
+    // Check if user has access to the module
+    if (!canAccess(item.requiredModule)) return false
+    
+    // Check admin-only items
+    if (item.adminOnly && user?.role !== 'admin') return false
+    
+    return true
+  })
 
   return (
     <div className={cn(
@@ -71,7 +107,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 p-2 space-y-1">
-        {navigation.map((item) => {
+        {filteredNavigation.map((item) => {
           const isActive = location.pathname === item.href
           return (
             <Link
@@ -92,15 +128,23 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </nav>
 
       {/* User Section */}
-      {!collapsed && (
+      {!collapsed && user && (
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-gray-600 text-sm font-medium">U</span>
+            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm font-medium">
+                {getInitials(user.firstName, user.lastName)}
+              </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">User</p>
-              <p className="text-xs text-gray-500 truncate">Admin</p>
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user.firstName} {user.lastName}
+              </p>
+              <div className="flex items-center space-x-1 mt-1">
+                <Badge className={`text-xs ${getRoleBadgeColor(user.role)}`}>
+                  {ROLE_LABELS[user.role]}
+                </Badge>
+              </div>
             </div>
           </div>
         </div>

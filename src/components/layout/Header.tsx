@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Search, Bell, Plus, Settings, User, LogOut } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Search, Bell, Plus, Settings, User, LogOut, Shield } from 'lucide-react'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,15 +9,33 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Badge } from '@/components/ui/badge'
-import { blink } from '@/blink/client'
+} from '../ui/dropdown-menu'
+import { Badge } from '../ui/badge'
+import { useAuth } from '../../hooks/useAuth'
+import { ROLE_LABELS } from '../../types/auth'
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState('')
+  const { user, logout } = useAuth()
 
-  const handleLogout = () => {
-    blink.auth.logout()
+  const handleLogout = async () => {
+    await logout()
+  }
+
+  const getRoleBadgeColor = (role: string) => {
+    const colors = {
+      admin: 'bg-red-100 text-red-800',
+      lead_generation: 'bg-green-100 text-green-800',
+      pre_sales: 'bg-blue-100 text-blue-800',
+      sales: 'bg-purple-100 text-purple-800',
+      implementation: 'bg-orange-100 text-orange-800',
+      finance: 'bg-yellow-100 text-yellow-800'
+    }
+    return colors[role as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+  }
+
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
   }
 
   return (
@@ -110,25 +128,62 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">U</span>
+                  <span className="text-white text-sm font-medium">
+                    {user ? getInitials(user.firstName, user.lastName) : 'U'}
+                  </span>
+                </div>
+                <div className="text-left hidden md:block">
+                  <div className="text-sm font-medium text-gray-900">
+                    {user ? `${user.firstName} ${user.lastName}` : 'User'}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {user?.role && ROLE_LABELS[user.role]}
+                  </div>
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuLabel>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {user ? `${user.firstName} ${user.lastName}` : 'User'}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user?.email}
+                  </p>
+                  <div className="flex items-center space-x-2 mt-2">
+                    {user?.role && (
+                      <Badge className={getRoleBadgeColor(user.role)}>
+                        {ROLE_LABELS[user.role]}
+                      </Badge>
+                    )}
+                    {user?.department && (
+                      <Badge variant="outline" className="text-xs">
+                        {user.department}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <User className="h-4 w-4 mr-2" />
-                Profile
+                Profile Settings
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="h-4 w-4 mr-2" />
-                Settings
+                Account Settings
               </DropdownMenuItem>
+              {user?.role === 'admin' && (
+                <DropdownMenuItem>
+                  <Shield className="h-4 w-4 mr-2" />
+                  User Management
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
                 <LogOut className="h-4 w-4 mr-2" />
-                Sign out
+                Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
