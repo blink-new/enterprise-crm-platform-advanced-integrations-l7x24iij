@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from '@/components/layout/Layout'
 import { Dashboard } from '@/pages/Dashboard'
+import Contacts from '@/pages/Contacts'
+import Leads from '@/pages/Leads'
+import Opportunities from '@/pages/Opportunities'
+import Contracts from '@/pages/Contracts'
+import Integrations from '@/pages/Integrations'
 import { blink } from '@/blink/client'
 import { Toaster } from '@/components/ui/toaster'
 
@@ -57,17 +62,17 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
-            <Route path="contacts" element={<div className="p-6"><h1 className="text-2xl font-bold">Contacts</h1><p className="text-gray-600">Contact management coming soon...</p></div>} />
-            <Route path="leads" element={<div className="p-6"><h1 className="text-2xl font-bold">Leads</h1><p className="text-gray-600">Lead management coming soon...</p></div>} />
-            <Route path="opportunities" element={<div className="p-6"><h1 className="text-2xl font-bold">Opportunities</h1><p className="text-gray-600">Opportunity management coming soon...</p></div>} />
+            <Route path="contacts" element={<Contacts />} />
+            <Route path="leads" element={<Leads />} />
+            <Route path="opportunities" element={<Opportunities />} />
             <Route path="companies" element={<div className="p-6"><h1 className="text-2xl font-bold">Companies</h1><p className="text-gray-600">Company management coming soon...</p></div>} />
             <Route path="tasks" element={<div className="p-6"><h1 className="text-2xl font-bold">Tasks</h1><p className="text-gray-600">Task management coming soon...</p></div>} />
             <Route path="calendar" element={<div className="p-6"><h1 className="text-2xl font-bold">Calendar</h1><p className="text-gray-600">Calendar integration coming soon...</p></div>} />
-            <Route path="contracts" element={<div className="p-6"><h1 className="text-2xl font-bold">Contracts</h1><p className="text-gray-600">Contract management coming soon...</p></div>} />
+            <Route path="contracts" element={<Contracts />} />
             <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Reports</h1><p className="text-gray-600">Advanced reporting coming soon...</p></div>} />
             <Route path="marketing" element={<div className="p-6"><h1 className="text-2xl font-bold">Marketing</h1><p className="text-gray-600">Marketing automation coming soon...</p></div>} />
             <Route path="billing" element={<div className="p-6"><h1 className="text-2xl font-bold">Billing</h1><p className="text-gray-600">Billing management coming soon...</p></div>} />
-            <Route path="integrations" element={<div className="p-6"><h1 className="text-2xl font-bold">Integrations</h1><p className="text-gray-600">Third-party integrations coming soon...</p></div>} />
+            <Route path="integrations" element={<Integrations />} />
             <Route path="settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings</h1><p className="text-gray-600">System settings coming soon...</p></div>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

@@ -2,15 +2,16 @@ export interface Contact {
   id: string
   firstName: string
   lastName: string
-  email: string
+  email?: string
   phone?: string
   company?: string
-  title?: string
-  status: 'active' | 'inactive' | 'prospect'
+  jobTitle?: string
   leadSource?: string
-  assignedTo?: string
-  createdAt: string
-  updatedAt: string
+  status?: string
+  tags?: string
+  notes?: string
+  createdAt?: string
+  updatedAt?: string
   userId: string
 }
 
@@ -18,32 +19,81 @@ export interface Lead {
   id: string
   firstName: string
   lastName: string
-  email: string
+  email?: string
   phone?: string
   company?: string
-  title?: string
-  status: 'new' | 'contacted' | 'qualified' | 'unqualified' | 'converted'
-  leadSource: string
+  jobTitle?: string
+  leadSource?: string
+  status?: string
   score?: number
+  temperature?: string
   assignedTo?: string
-  createdAt: string
-  updatedAt: string
+  notes?: string
+  createdAt?: string
+  updatedAt?: string
   userId: string
 }
 
 export interface Opportunity {
   id: string
   name: string
-  accountName: string
   contactId?: string
-  stage: 'prospecting' | 'qualification' | 'needs-analysis' | 'proposal' | 'negotiation' | 'closed-won' | 'closed-lost'
-  amount: number
-  probability: number
-  closeDate: string
+  company?: string
+  value?: number
+  stage?: string
+  probability?: number
+  closeDate?: string
+  leadSource?: string
   assignedTo?: string
   description?: string
-  createdAt: string
-  updatedAt: string
+  createdAt?: string
+  updatedAt?: string
+  userId: string
+}
+
+export interface Contract {
+  id: string
+  title: string
+  contactId?: string
+  opportunityId?: string
+  contractType?: string
+  value?: number
+  status?: string
+  startDate?: string
+  endDate?: string
+  templateId?: string
+  hellosignSignatureRequestId?: string
+  signedDate?: string
+  documentUrl?: string
+  createdAt?: string
+  updatedAt?: string
+  userId: string
+}
+
+export interface Integration {
+  id: string
+  name: string
+  type: string
+  status?: string
+  config?: string
+  lastSync?: string
+  createdAt?: string
+  updatedAt?: string
+  userId: string
+}
+
+export interface Activity {
+  id: string
+  type: string
+  subject: string
+  description?: string
+  contactId?: string
+  leadId?: string
+  opportunityId?: string
+  contractId?: string
+  dueDate?: string
+  completed?: number
+  createdAt?: string
   userId: string
 }
 
@@ -80,34 +130,6 @@ export interface Task {
   userId: string
 }
 
-export interface Contract {
-  id: string
-  title: string
-  clientName: string
-  clientEmail: string
-  amount: number
-  status: 'draft' | 'sent' | 'signed' | 'completed' | 'cancelled'
-  templateId?: string
-  signatureStatus: 'pending' | 'partial' | 'complete'
-  sentDate?: string
-  signedDate?: string
-  expiryDate?: string
-  helloSignId?: string
-  createdAt: string
-  updatedAt: string
-  userId: string
-}
-
-export interface Integration {
-  id: string
-  name: string
-  type: 'crm' | 'calendar' | 'email' | 'social' | 'finance' | 'communication' | 'signature'
-  status: 'connected' | 'disconnected' | 'error'
-  lastSync?: string
-  settings?: Record<string, any>
-  userId: string
-}
-
 export interface DashboardMetrics {
   totalContacts: number
   totalLeads: number
@@ -117,15 +139,4 @@ export interface DashboardMetrics {
   activeTasks: number
   pendingContracts: number
   recentActivity: Activity[]
-}
-
-export interface Activity {
-  id: string
-  type: 'contact_created' | 'lead_converted' | 'opportunity_won' | 'task_completed' | 'contract_signed'
-  title: string
-  description: string
-  timestamp: string
-  userId: string
-  relatedTo?: string
-  relatedType?: string
 }
